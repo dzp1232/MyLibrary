@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dzp.library.dao.LendInfoMapper">
+  <resultMap id="BaseResultMap" type="com.dzp.library.pojo.LendInfo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="reader_id" jdbcType="INTEGER" property="readerId" />
+    <result column="book_id" jdbcType="INTEGER" property="bookId" />
+    <result column="lend_date" jdbcType="TIMESTAMP" property="lendDate" />
+    <result column="back_date" jdbcType="TIMESTAMP" property="backDate" />
+    <result column="fine" jdbcType="DOUBLE" property="fine" />
+    <result column="state" jdbcType="VARCHAR" property="state" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, reader_id, book_id, lend_date, back_date, fine, state
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from lend_list
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from lend_list
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.dzp.library.pojo.LendInfo">
+    insert into lend_list (id, reader_id, book_id, 
+      lend_date, back_date, fine, 
+      state)
+    values (#{id,jdbcType=INTEGER}, #{readerId,jdbcType=INTEGER}, #{bookId,jdbcType=INTEGER}, 
+      #{lendDate,jdbcType=TIMESTAMP}, #{backDate,jdbcType=TIMESTAMP}, #{fine,jdbcType=DOUBLE}, 
+      #{state,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dzp.library.pojo.LendInfo">
+    insert into lend_list
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="readerId != null">
+        reader_id,
+      </if>
+      <if test="bookId != null">
+        book_id,
+      </if>
+      <if test="lendDate != null">
+        lend_date,
+      </if>
+      <if test="backDate != null">
+        back_date,
+      </if>
+      <if test="fine != null">
+        fine,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="readerId != null">
+        #{readerId,jdbcType=INTEGER},
+      </if>
+      <if test="bookId != null">
+        #{bookId,jdbcType=INTEGER},
+      </if>
+      <if test="lendDate != null">
+        #{lendDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="backDate != null">
+        #{backDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="fine != null">
+        #{fine,jdbcType=DOUBLE},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.dzp.library.pojo.LendInfo">
+    update lend_list
+    <set>
+      <if test="readerId != null">
+        reader_id = #{readerId,jdbcType=INTEGER},
+      </if>
+      <if test="bookId != null">
+        book_id = #{bookId,jdbcType=INTEGER},
+      </if>
+      <if test="lendDate != null">
+        lend_date = #{lendDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="backDate != null">
+        back_date = #{backDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="fine != null">
+        fine = #{fine,jdbcType=DOUBLE},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dzp.library.pojo.LendInfo">
+    update lend_list
+    set reader_id = #{readerId,jdbcType=INTEGER},
+      book_id = #{bookId,jdbcType=INTEGER},
+      lend_date = #{lendDate,jdbcType=TIMESTAMP},
+      back_date = #{backDate,jdbcType=TIMESTAMP},
+      fine = #{fine,jdbcType=DOUBLE},
+      state = #{state,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+    <!--<resultMap type="com.dzp.library.pojo.LendInfo" id="Lendinfo">-->
+        <!--<result column="id" property="id"/>-->
+        <!--<result column="reader_id" property="reader_id"/>-->
+        <!--<result column="book_id" property="book_id"/>-->
+        <!--<result column="lend_date" property="lend_date"/>-->
+        <!--<result column="back_date" property="back_date"/>-->
+        <!--<result column="fine" property="fine"/>-->
+        <!--<result column="state" property="state"/>-->
+        <!--<association  javaType="Reader" property="reader">-->
+            <!--<result column="cid" property="cid"/>-->
+            <!--<result column="cname" property="cname"/>-->
+        <!--</association>-->
+    <!--</resultMap>-->
+
+
+    <select id="queryList" resultType="Lendinfo">
+        <!-- 根据条件查询 图书的所有信息 -->
+        select a.id,
+        a.reader_id,
+        a.book_id,
+        a.lend_date,
+        a.back_date,
+        a.state,
+        a.fine,
+        b.name as bookName,
+        c.name as readerName
+        from lend_list a
+        LEFT JOIN book_info b
+        on a.book_id=b.book_id
+        LEFT JOIN reader_info c
+        on a.reader_id=c.reader_id
+        <where>
+            <if test="state!=null and state!=''">
+                and a.state =#{state}
+            </if>
+            <if test="rname!=null and rname!=''">
+                and c.name LIKE concat("%",#{rname},"%")
+            </if>
+            <if test="bname!=null and bname!=''">
+                and b.name LIKE concat("%",#{bname},"%")
+            </if>
+        </where>
+        limit #{startIndex},#{pagesize}
+    </select>
+
+    <select id="queryCount" resultType="int">
+        select count(*)
+        from lend_list a
+        LEFT JOIN book_info b
+        on a.book_id=b.book_id
+        LEFT JOIN reader_info c
+        on a.reader_id=c.reader_id
+        <where>
+            <if test="state!=null and state!=''">
+                and a.state =#{state}
+            </if>
+            <if test="rname!=null and rname!=''">
+                and c.name LIKE concat("%",#{rname},"%")
+            </if>
+            <if test="bname!=null and bname!=''">
+                and b.name LIKE concat("%",#{bname},"%")
+            </if>
+        </where>
+    </select>
+
+
+    <!--归还图书-->
+    <update id="backbook">
+        UPDATE lend_list set state=1 ,fine=0 where reader_id=#{reader_id} and book_id=#{book_id};
+        UPDATE book_info set stock=stock+1 where book_id=#{book_id};
+    </update>
+
+    <!-- 判断读者是否借过此书-->
+    <select id="isLended" parameterType="LendInfo" resultType="Integer">
+        select  count(*) from lend_list where reader_id=#{reader_id} and book_id=#{book_id} and state=2
+    </select>
+
+
+    <select id="cardState" parameterType="int" resultType="Integer">
+        select  count(*) from lend_list where reader_id=#{reader_id}
+    </select>
+
+
+    <!-- 添加借阅记录 -->
+    <insert id="addLead" parameterType="LendInfo">
+        INSERT into lend_list(
+        reader_id,
+        book_id,
+        lend_date,
+        back_date,
+        state,
+        fine
+        )
+        VALUES(
+        #{reader_id},#{book_id},#{lend_date},#{back_date},#{state},#{fine}
+        )
+    </insert>
+
+
+</mapper>
